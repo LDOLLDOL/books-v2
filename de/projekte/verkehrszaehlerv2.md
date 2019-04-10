@@ -144,5 +144,5 @@ void loop() {
   }
 }
 ```
-![Bild des Zählers + Display](../../../pictures/projekte/Personenzähler.png)
+![Bild des Zählers + Display](../../../pictures/projekte/Personenzähler.jpeg)
 Das Endprodukt aus diesem Programm ist, dass der Personenzähler jeden zählt, der sowhl raus, als auch rein geht.
