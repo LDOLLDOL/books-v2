@@ -140,8 +140,10 @@ void loop() {
     display.setTextColor(WHITE,BLACK);  //hier soll das Display erneut die aktuelle personenanzahl anzeigen
     display.println(personenanzahl);
   display.display();
+  delay(750);
   }
 }
 ```
+Ich habe einen `delay` eingefügt, weil sonst Personen, die langsam laufen doppelt oder dreifach gezählt werden.
 ![Bild des Zählers + Display](../../../pictures/projekte/Personenzähler.png)
 Das Endprodukt aus diesem Programm ist, dass der Personenzähler jeden zählt, der sowhl raus, als auch rein geht.
