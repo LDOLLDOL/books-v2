@@ -77,3 +77,71 @@ nicht zu Störungen durch Bewegungen im Hintergrund kommt. Effektiv misst der Se
 - Damit die Messwerte beim einfahren in den Messbereich nicht zu sehr schwanken, kann es helfen, zwischen den einzelnen Messungen eine Verzögerung von 200ms zu programmieren.
     
 {% endcollapse %}
+
+## Lösung(für einen Personenzähler)
+
+Um alle Sensoren, Variablen, etc. zu benutzen muss man sie zuerst definieren.
+```arduino
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <senseBoxIO.h>
+#include "SenseBoxMCU.h"
+
+int personenanzahl;  //hier wird die Variable pesonenanzahl erstellt
+int Sperre;          //hier wird die Variable Sperre erstellt
+
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+
+Ultrasonic UltrasonicA(1,2);  //hier wird der Ultraschall Distanzsensor definiert
+```
+Im `setup` sind alle Aktionen, die zu Anfang, der Messungen ausgeführt werden müssen. Wie z.B. das Display an zu schalten, den Variablen Werte zuzuweisen, usw.
+```arduino
+void setup() {
+  senseBoxIO.powerI2C(true);
+delay(2000);
+display.begin(SSD1306_SWITCHCAPVCC, 0x3D);  //hier wird das Display initialisiert
+display.display();
+delay(100);
+display.clearDisplay();
+
+  personenanzahl = 0;  //hier wird die Variable personenanzahl auf 0 gesetzt
+    display.setCursor(0,0);
+    display.setTextSize(3);
+    display.setTextColor(WHITE,BLACK);    //hier wird dem Display gesagt, dass es ganz zu Anfang die Personenanzahl anzeigen soll
+    display.println(personenanzahl);
+  display.display();
+
+  Sperre = 0;  //hier wird die Variable Sperre auf 0 gesetzt
+}
+```
+Im `loop` werden dann alle Aktionen durchgeführt, damit der Personenzähler funktioniert.
+```arduino
+void loop() {
+  if (UltrasonicA.getDistance() < 80&& Sperre == 0){  //hier wird geprüft, ob der Sensor eine länge unter 80 cm misst
+    personenanzahl = personenanzahl + 1;  //wenn dies eintrifft wird die personen anzahl um einen erhöht
+    Sperre = 1;  //und die Sperre setzt sich auf 1, damit die person nicht zweimal gezählt wird, wenn z.B. jemand in der Tür stehen bleibt oder langsam durch die Tür geht
+    
+  display.clearDisplay();  //hier wird das Display einmal gelöscht
+    display.setCursor(0,0);
+    display.setTextSize(3);
+    display.setTextColor(WHITE,BLACK);  //hier soll der Sensor die aktuelle Personenanzahl anzeigen
+    display.println(personenanzahl);
+  display.display();
+  
+  }else if (UltrasonicA.getDistance() > 80&& Sperre == 1){  //wenn die `if` bedingung nicht erfüllt wird soll die Sperre auf 0 bleiben und soll somit auch nicht aktiviert werden
+    Sperre = 0;
+
+    display.clearDisplay();  //hier wird das Display wieder gelöscht
+    display.setCursor(0,0);
+    display.setTextSize(3);
+    display.setTextColor(WHITE,BLACK);  //hier soll das Display erneut die aktuelle personenanzahl anzeigen
+    display.println(personenanzahl);
+  display.display();
+  }
+}
+```
+![Bild des Zählers + Display](../../../pictures/projekte/Personenzähler.png)
+Das Endprodukt aus diesem Programm ist, dass der Personenzähler jeden zählt, der sowhl raus, als auch rein geht.
